@@ -26,6 +26,8 @@ tr:hover { background: #f8f9fa; }
 .stat-card { background: #f8f9fa; padding: 20px; border-radius: 10px; text-align: center; flex:1; }
 .stat-number { font-size: 32px; font-weight: bold; color: #667eea; }
 .stat-label { color: #666; margin-top: 5px; }
+.error { color: red; text-align: center; margin-top: 20px; }
+.success { color: green; text-align: center; margin-top: 20px; }
 </style>
 </head>
 <body>
@@ -42,7 +44,7 @@ tr:hover { background: #f8f9fa; }
 </div>
 
 <script>
-const DATA_FILE_URL = 'https://onedrive.live.com/download?resid=934396673CD30BAF!se2742167b4b4498bbcda66684d95a645';
+const DATA_FILE_URL = './sample_webpage_csv.csv'; // CSV in same folder as index.html
 
 function showMessage(message, type) {
     const msgDiv = document.getElementById('message');
@@ -52,11 +54,13 @@ function showMessage(message, type) {
 
 function displayData(data) {
     if (!data || data.length === 0) {
-        document.getElementById('dataContainer').innerHTML = '<p>No data found in CSV</p>';
+        document.getElementById('dataContainer').innerHTML = '<p class="error">No data found in CSV</p>';
         return;
     }
 
     const container = document.getElementById('dataContainer');
+
+    // Display stats
     const columns = Object.keys(data[0]).length;
     const stats = `
         <div class="stats">
@@ -71,6 +75,7 @@ function displayData(data) {
         </div>
     `;
 
+    // Build table
     let html = stats + '<table>';
     html += '<tr>';
     Object.keys(data[0]).forEach(key => html += `<th>${key}</th>`);
