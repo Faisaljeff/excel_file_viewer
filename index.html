@@ -14,14 +14,41 @@ h1 { text-align: center; color: #333; margin-bottom: 10px; }
 .loading { text-align: center; padding: 40px; color: #667eea; font-size: 18px; }
 .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #667eea; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-th { background: #667eea; color: white; padding: 12px; text-align: left; position: sticky; top: 0; }
+
+.table-wrapper {
+    overflow-x: auto;
+    width: 100%;
+}
+table {
+    width: 100%;
+    min-width: 800px; /* ensures table doesn't shrink too much */
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: white;
+}
+th {
+    position: sticky;
+    top: 0;
+    background: #667eea;
+    color: white;
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+}
 td { padding: 10px 12px; border-bottom: 1px solid #eee; }
 tr:hover { background: #f8f9fa; }
-.stats { display: flex; justify-content: space-around; margin: 20px 0; gap: 20px; }
-.stat-card { background: #f8f9fa; padding: 20px; border-radius: 10px; text-align: center; flex:1; }
+
+.stats {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px 0;
+    gap: 20px;
+    overflow-x: auto;
+}
+.stat-card { background: #f8f9fa; padding: 20px; border-radius: 10px; text-align: center; flex: 1; min-width: 120px; }
 .stat-number { font-size: 32px; font-weight: bold; color: #667eea; }
 .stat-label { color: #666; margin-top: 5px; }
+
 .error { color: red; text-align: center; margin-top: 20px; }
 .success { color: green; text-align: center; margin-top: 20px; }
 </style>
@@ -71,21 +98,24 @@ function displayData(data) {
         </div>
     `;
 
-    // Build table
-    let html = stats + '<table>';
+    // Build table with horizontal scroll wrapper
+    let html = stats + '<div class="table-wrapper"><table>';
+
+    // Header row
     html += '<tr>';
     Object.keys(data[0]).forEach(key => html += `<th>${key}</th>`);
     html += '</tr>';
 
+    // Data rows
     data.forEach(row => {
         html += '<tr>';
         Object.values(row).forEach(val => html += `<td>${val}</td>`);
         html += '</tr>';
     });
 
-    html += '</table>';
+    html += '</table></div>';
     container.innerHTML = html;
-    showMessage(`✓ CSV loaded successfully (${data.length} rows)`, 'success');
+    showMessage(`✓ CSV loaded successfully (${data.length} rows, ${columns} columns)`, 'success');
 }
 
 async function loadData() {
