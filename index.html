@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CSV Data Dashboard</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+<script src="./papaparse.min.js"></script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; min-height: 100vh; }
@@ -29,7 +29,7 @@ tr:hover { background: #f8f9fa; }
 <body>
 <div class="container">
     <h1>📊 CSV Data Dashboard</h1>
-    <p class="subtitle">Live data from GitHub CSV</p>
+    <p class="subtitle">Live data from CSV</p>
     <div id="message"></div>
     <div id="dataContainer">
         <div class="loading">
@@ -40,7 +40,7 @@ tr:hover { background: #f8f9fa; }
 </div>
 
 <script>
-const DATA_FILE_URL = 'https://raw.githubusercontent.com/Faisaljeff/excel_file_viewer/main/sample_webpage_csv.csv';
+const DATA_FILE_URL = './sample_webpage_csv.csv'; // CSV in same folder
 
 function showMessage(message, type) {
     const msgDiv = document.getElementById('message');
@@ -84,4 +84,28 @@ function displayData(data) {
     });
 
     html += '</table>';
-    c
+    container.innerHTML = html;
+    showMessage(`✓ CSV loaded successfully (${data.length} rows)`, 'success');
+}
+
+async function loadData() {
+    try {
+        const response = await fetch(DATA_FILE_URL);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const csvText = await response.text();
+        Papa.parse(csvText, {
+            header: true,
+            skipEmptyLines: true,
+            complete: results => displayData(results.data),
+            error: err => showMessage(`Error parsing CSV: ${err.message}`, 'error')
+        });
+    } catch (error) {
+        console.error(error);
+        showMessage(`Failed to load CSV: ${error.message}`, 'error');
+    }
+}
+
+window.addEventListener('DOMContentLoaded', loadData);
+</script>
+</body>
+</html>
