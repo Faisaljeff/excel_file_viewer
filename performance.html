@@ -1,473 +1,307 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Department Performance Dashboard</title>
 <script src="papaparse.min.js"></script>
 <style>
-  * {
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #f5f7fa;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
-  }
-  
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    min-height: 100vh;
-    padding: 20px;
     color: #333;
   }
-  
-  .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    background: white;
-    padding: 40px;
-    border-radius: 20px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-  }
-  
-  .header {
-    text-align: center;
-    margin-bottom: 40px;
-    padding-bottom: 30px;
-    border-bottom: 3px solid #f0f0f0;
-  }
-  
-  h1 {
-    font-size: 2.5rem;
-    color: #667eea;
-    margin-bottom: 10px;
-    font-weight: 700;
-  }
-  
-  .subtitle {
-    color: #666;
-    font-size: 1.1rem;
-  }
-  
-  .date-picker-section {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 40px;
-    padding: 25px;
-    background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
-    border-radius: 15px;
-  }
-  
-  .date-picker-section label {
-    font-weight: 600;
-    color: #667eea;
-    font-size: 1.1rem;
-  }
-  
-  input[type="date"] {
-    padding: 12px 20px;
-    border: 2px solid #667eea;
-    border-radius: 10px;
-    font-size: 16px;
-    font-family: inherit;
-    transition: all 0.3s ease;
-    background: white;
-  }
-  
-  input[type="date"]:focus {
-    outline: none;
-    border-color: #764ba2;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-  }
-  
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
-    margin-bottom: 30px;
-  }
-  
-  .stat-card {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 25px;
-    border-radius: 15px;
+
+  header {
+    background: #004aad;
     color: white;
-    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
-    transition: transform 0.3s ease;
+    padding: 15px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
-  
-  .stat-card:hover {
-    transform: translateY(-5px);
+
+  header h1 {
+    font-size: 22px;
+    margin: 0;
   }
-  
-  .stat-card h3 {
-    font-size: 0.9rem;
-    opacity: 0.9;
-    margin-bottom: 10px;
-    font-weight: 500;
-  }
-  
-  .stat-card .value {
-    font-size: 2rem;
-    font-weight: 700;
-  }
-  
-  .data-section {
-    margin-top: 30px;
-  }
-  
-  .info-grid {
-    display: grid;
-    gap: 15px;
-    margin-bottom: 30px;
-  }
-  
-  .info-card {
-    background: #f8f9fa;
-    padding: 20px;
-    border-radius: 12px;
-    border-left: 4px solid #667eea;
-    transition: all 0.3s ease;
-  }
-  
-  .info-card:hover {
-    background: #f0f1f5;
-    transform: translateX(5px);
-  }
-  
-  .info-card .label {
-    font-weight: 600;
-    color: #667eea;
-    font-size: 0.9rem;
-    margin-bottom: 5px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  
-  .info-card .value {
-    color: #333;
-    font-size: 1.1rem;
-  }
-  
-  .system-issue-card {
-    background: linear-gradient(135deg, #ff6b6b15 0%, #ff8e5315 100%);
-    border: 2px solid #ff6b6b;
-    padding: 30px;
-    margin-top: 30px;
-    border-radius: 15px;
-    box-shadow: 0 8px 20px rgba(255, 107, 107, 0.2);
-  }
-  
-  .system-issue-card h3 {
-    color: #ff6b6b;
-    margin-bottom: 20px;
-    font-size: 1.5rem;
+
+  .date-controls {
     display: flex;
     align-items: center;
     gap: 10px;
   }
-  
-  .system-issue-card .detail {
+
+  button {
+    background: #004aad;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  button:hover {
+    background: #0066ff;
+  }
+
+  input[type="date"] {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 15px;
+  }
+
+  main {
+    padding: 20px;
+    max-width: 1200px;
+    margin: auto;
+  }
+
+  .no-data {
+    text-align: center;
+    color: #777;
+    margin-top: 30px;
+    font-size: 16px;
+  }
+
+  .card {
     background: white;
-    padding: 15px;
-    margin-bottom: 12px;
+    border-radius: 10px;
+    padding: 15px 20px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+
+  .card h3 {
+    color: #004aad;
+    margin-bottom: 10px;
+  }
+
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 10px;
+  }
+
+  .metric {
+    background: #f0f4ff;
     border-radius: 8px;
-    border-left: 3px solid #ff6b6b;
-  }
-  
-  .system-issue-card .detail-label {
-    font-weight: 600;
-    color: #ff6b6b;
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    margin-bottom: 5px;
-  }
-  
-  .system-issue-card .detail-value {
-    color: #333;
-  }
-  
-  #noData {
+    padding: 10px;
     text-align: center;
-    color: #999;
-    margin-top: 60px;
-    font-size: 1.2rem;
-    padding: 40px;
-    background: #f8f9fa;
-    border-radius: 15px;
   }
-  
-  .loading {
-    text-align: center;
-    padding: 40px;
-    color: #667eea;
-    font-size: 1.2rem;
+
+  .metric span {
+    display: block;
+    font-size: 14px;
+    color: #666;
   }
-  
-  .debug-info {
+
+  .metric strong {
+    font-size: 18px;
+    color: #111;
+  }
+
+  /* System Issue Section Styles */
+  .system-issue-section {
     margin-top: 20px;
     padding: 15px;
     background: #fff3cd;
+    border-left: 4px solid #ff9800;
     border-radius: 8px;
-    font-size: 0.9rem;
-    color: #856404;
-    white-space: pre-wrap;
-    font-family: monospace;
+  }
+
+  .system-issue-section h4 {
+    color: #ff9800;
+    margin: 0 0 15px 0;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .system-issue-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+  }
+
+  .system-issue-metric {
+    background: white;
+    border-radius: 6px;
+    padding: 12px;
+    border-left: 3px solid #ff9800;
+  }
+
+  .system-issue-metric span {
+    display: block;
+    font-size: 13px;
+    color: #666;
+    font-weight: 600;
+    margin-bottom: 5px;
+  }
+
+  .system-issue-metric strong {
+    font-size: 16px;
+    color: #333;
   }
 </style>
 </head>
 
 <body>
-<div class="container">
-  <div class="header">
-    <h1>📊 Performance Dashboard</h1>
-    <p class="subtitle">Daily Performance Metrics & System Status</p>
-  </div>
+  <header>
+    <h1>Department Performance Dashboard</h1>
+    <div class="date-controls">
+      <button id="prevDate">&lt;</button>
+      <input type="date" id="datePicker" />
+      <button id="nextDate">&gt;</button>
+    </div>
+  </header>
 
-  <div class="date-picker-section">
-    <label for="datePicker">📅 Select Date:</label>
-    <input type="date" id="datePicker" />
-  </div>
-
-  <div id="loading" class="loading">Loading data...</div>
-  <div id="dataSection" class="data-section" style="display:none;"></div>
-  <div id="noData"></div>
-  <div id="debugInfo" class="debug-info"></div>
-</div>
+  <main>
+    <div id="dataContainer"></div>
+  </main>
 
 <script>
-  let csvData = [];
-  let isDataLoaded = false;
+  const csvFilePath = "performance_us_cms.csv";
+  const dataContainer = document.getElementById("dataContainer");
+  const datePicker = document.getElementById("datePicker");
 
-  // Enhanced date normalization function
-  function normalizeDate(dateStr) {
-    if (!dateStr || dateStr.trim() === "") return "";
-    
-    dateStr = dateStr.trim();
-    
-    // Check if already in YYYY-MM-DD format
-    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
-      return dateStr;
-    }
-    
-    // Handle MM/DD/YYYY or DD/MM/YYYY or M/D/YYYY formats
-    const parts = dateStr.split(/[\/\-]/);
-    if (parts.length === 3) {
-      let [p1, p2, p3] = parts.map(x => x.trim());
-      
-      // Determine the year (should be 4 digits or will need conversion)
-      let year, month, day;
-      
-      if (p3.length === 4) {
-        // Format is either MM/DD/YYYY or DD/MM/YYYY
-        year = p3;
-        
-        // Check if first part is > 12 (must be day then)
-        if (parseInt(p1) > 12) {
-          day = p1.padStart(2, '0');
-          month = p2.padStart(2, '0');
-        } else if (parseInt(p2) > 12) {
-          // Second part > 12, so format is MM/DD/YYYY
-          month = p1.padStart(2, '0');
-          day = p2.padStart(2, '0');
-        } else {
-          // Ambiguous - assume MM/DD/YYYY (US format)
-          month = p1.padStart(2, '0');
-          day = p2.padStart(2, '0');
+  // --- Utility: Convert Date object to DD-MM-YYYY (to match CSV format)
+  function formatDateToCSV(date) {
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const year = d.getFullYear();
+    return `${day}-${month}-${year}`;
+  }
+
+  // --- Utility: Format Date to YYYY-MM-DD for <input type="date">
+  function formatDateForInput(date) {
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const year = d.getFullYear();
+    return `${year}-${month}-${day}`;
+  }
+
+  // --- Set default date to yesterday
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  datePicker.value = formatDateForInput(yesterday);
+
+  // --- Fetch and render CSV data
+  function loadData(selectedDate) {
+    dataContainer.innerHTML = "<p class='no-data'>Loading data...</p>";
+
+    Papa.parse(csvFilePath, {
+      download: true,
+      header: true,
+      complete: function(results) {
+        const allData = results.data;
+        const formattedDate = formatDateToCSV(selectedDate);
+        const filtered = allData.filter(row => row["Date"] === formattedDate);
+
+        if (filtered.length === 0) {
+          dataContainer.innerHTML = `<p class='no-data'>No data available for ${formattedDate}</p>`;
+          return;
         }
-      } else if (p1.length === 4) {
-        // Format is YYYY/MM/DD or YYYY/DD/MM
-        year = p1;
-        month = p2.padStart(2, '0');
-        day = p3.padStart(2, '0');
-      } else {
-        // Default to MM/DD/YYYY
-        month = p1.padStart(2, '0');
-        day = p2.padStart(2, '0');
-        year = p3.length === 2 ? '20' + p3 : p3;
-      }
-      
-      return `${year}-${month}-${day}`;
-    }
-    
-    return dateStr;
-  }
 
-  // Load CSV using PapaParse
-  Papa.parse("performance_us_cms.csv", {
-    download: true,
-    header: true,
-    dynamicTyping: false,
-    skipEmptyLines: true,
-    complete: function(results) {
-      csvData = results.data;
-      isDataLoaded = true;
-      document.getElementById("loading").style.display = "none";
-      
-      console.log("CSV Loaded:", csvData.length, "records");
-      
-      // Debug: Show first few date formats
-      const debugInfo = document.getElementById("debugInfo");
-      let debugText = "Sample dates from CSV:\n";
-      csvData.slice(0, 5).forEach((row, idx) => {
-        debugText += `Row ${idx + 1}: "${row.Date}" → normalized: "${normalizeDate(row.Date)}"\n`;
-      });
-      debugInfo.textContent = debugText;
-      
-      // Set today's date as default
-      const today = new Date().toISOString().split('T')[0];
-      document.getElementById("datePicker").value = today;
-      
-      // Try to load today's data
-      loadDataForDate(today);
-    },
-    error: function(error) {
-      document.getElementById("loading").innerHTML = 
-        `<span style="color: #ff6b6b;">Error loading CSV: ${error.message}</span>`;
-    }
-  });
-
-  // Helper function to detect system issue
-  function hasSystemIssue(row) {
-    const fields = [
-      "System Issue",
-      "System issue Ticket number",
-      "Issue Description",
-      "Issue Start Time",
-      "Issue End Time",
-      "Tools Impacted",
-      "LOB Impacted"
-    ];
-    return fields.some(f => row[f] && row[f].trim() !== "" && row[f].trim().toLowerCase() !== "no");
-  }
-
-  // Function to load data for a specific date
-  function loadDataForDate(selectedDate) {
-    const dataSection = document.getElementById("dataSection");
-    const noDataDiv = document.getElementById("noData");
-    
-    dataSection.innerHTML = "";
-    dataSection.style.display = "none";
-    noDataDiv.textContent = "";
-
-    if (!isDataLoaded) {
-      noDataDiv.textContent = "Data is still loading...";
-      return;
-    }
-
-    // Find matching row with flexible date matching
-    const row = csvData.find(r => {
-      const normalized = normalizeDate(r.Date);
-      return normalized === selectedDate;
-    });
-
-    if (!row) {
-      noDataDiv.textContent = `No data available for ${selectedDate}.`;
-      
-      // Show available dates for debugging
-      const availableDates = csvData
-        .map(r => normalizeDate(r.Date))
-        .filter(d => d)
-        .slice(0, 10);
-      noDataDiv.textContent += `\n\nAvailable dates (first 10): ${availableDates.join(', ')}`;
-      return;
-    }
-
-    dataSection.style.display = "block";
-
-    // Create stats grid for key metrics
-    const statsGrid = document.createElement("div");
-    statsGrid.className = "stats-grid";
-    
-    const keyMetrics = [
-      { key: "Total Login Time", label: "Total Login Time" },
-      { key: "Total Idle Time", label: "Total Idle Time" },
-      { key: "Total Active Time", label: "Total Active Time" },
-      { key: "Productive Hours", label: "Productive Hours" }
-    ];
-    
-    keyMetrics.forEach(metric => {
-      if (row[metric.key]) {
-        const card = document.createElement("div");
-        card.className = "stat-card";
-        card.innerHTML = `
-          <h3>${metric.label}</h3>
-          <div class="value">${row[metric.key]}</div>
-        `;
-        statsGrid.appendChild(card);
+        renderData(filtered);
+      },
+      error: function(err) {
+        dataContainer.innerHTML = `<p class='no-data'>Failed to load CSV: ${err.message}</p>`;
       }
     });
-    
-    if (statsGrid.children.length > 0) {
-      dataSection.appendChild(statsGrid);
-    }
+  }
 
-    // Create info grid for other data
-    const infoGrid = document.createElement("div");
-    infoGrid.className = "info-grid";
-    
-    const systemFields = [
-      "System Issue", "System issue Ticket number", "Issue Description",
-      "Issue Start Time", "Issue End Time", "Tools Impacted", "LOB Impacted"
-    ];
-    
-    const skipFields = ["Date", ...keyMetrics.map(m => m.key), ...systemFields];
-    
-    for (const key in row) {
-      if (!skipFields.includes(key) && row[key] && row[key].trim() !== "") {
-        const card = document.createElement("div");
-        card.className = "info-card";
-        card.innerHTML = `
-          <div class="label">${key}</div>
-          <div class="value">${row[key]}</div>
-        `;
-        infoGrid.appendChild(card);
-      }
-    }
-    
-    if (infoGrid.children.length > 0) {
-      dataSection.appendChild(infoGrid);
-    }
+  // --- Render filtered data in styled cards
+  function renderData(data) {
+    dataContainer.innerHTML = "";
 
-    // Handle system issue section
-    if (hasSystemIssue(row)) {
-      const sys = document.createElement("div");
-      sys.className = "system-issue-card";
-      sys.innerHTML = `
-        <h3>⚠️ System Issue Detected</h3>
-        <div class="detail">
-          <div class="detail-label">Ticket Number</div>
-          <div class="detail-value">${row["System issue Ticket number"] || "N/A"}</div>
-        </div>
-        <div class="detail">
-          <div class="detail-label">Issue Description</div>
-          <div class="detail-value">${row["Issue Description"] || "N/A"}</div>
-        </div>
-        <div class="detail">
-          <div class="detail-label">Time Period</div>
-          <div class="detail-value">
-            <strong>Start:</strong> ${row["Issue Start Time"] || "N/A"} | 
-            <strong>End:</strong> ${row["Issue End Time"] || "N/A"}
-          </div>
-        </div>
-        <div class="detail">
-          <div class="detail-label">Tools Impacted</div>
-          <div class="detail-value">${row["Tools Impacted"] || "N/A"}</div>
-        </div>
-        <div class="detail">
-          <div class="detail-label">LOB Impacted</div>
-          <div class="detail-value">${row["LOB Impacted"] || "N/A"}</div>
+    data.forEach(row => {
+      const card = document.createElement("div");
+      card.className = "card";
+      
+      // Check if there's a system issue
+      const hasSystemIssue = row["System Issue"] && row["System Issue"].trim().toLowerCase() === "yes";
+      
+      // Build the main metrics HTML
+      let cardHTML = `
+        <h3>${row["LOB"] || "Unnamed Department"}</h3>
+        <div class="metrics">
+          <div class="metric"><span>ACR</span><strong>${row["ACR"] || "-"}</strong></div>
+          <div class="metric"><span>CHT Forecast</span><strong>${row["CHT Forecast"] || "-"}</strong></div>
+          <div class="metric"><span>Actual CHT</span><strong>${row["Actual CHT"] || "-"}</strong></div>
+          <div class="metric"><span>Staffing Forecast</span><strong>${row["Staffing Forecast"] || "-"}</strong></div>
+          <div class="metric"><span>Staffing</span><strong>${row["Staffing"] || "-"}</strong></div>
+          <div class="metric"><span>Staffing Deficit</span><strong>${row["Staffing Deficit"] || "-"}</strong></div>
+          <div class="metric"><span>Volume Drivers</span><strong>${row["Volume Drivers"] || "-"}</strong></div>
         </div>
       `;
-      dataSection.appendChild(sys);
-    }
+
+      // Add system issue section only if System Issue = "Yes"
+      if (hasSystemIssue) {
+        cardHTML += `
+          <div class="system-issue-section">
+            <h4>⚠️ System Issue Detected</h4>
+            <div class="system-issue-metrics">
+              <div class="system-issue-metric">
+                <span>Ticket Number</span>
+                <strong>${row["System issue Ticket number"] || "-"}</strong>
+              </div>
+              <div class="system-issue-metric">
+                <span>Issue Description</span>
+                <strong>${row["Issue Description"] || "-"}</strong>
+              </div>
+              <div class="system-issue-metric">
+                <span>Issue Start Time</span>
+                <strong>${row["Issue Start Time"] || "-"}</strong>
+              </div>
+              <div class="system-issue-metric">
+                <span>Issue End Time</span>
+                <strong>${row["Issue End Time"] || "-"}</strong>
+              </div>
+              <div class="system-issue-metric">
+                <span>Tools Impacted</span>
+                <strong>${row["Tools Impacted"] || "-"}</strong>
+              </div>
+              <div class="system-issue-metric">
+                <span>LOB Impacted</span>
+                <strong>${row["LOB Impacted"] || "-"}</strong>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      card.innerHTML = cardHTML;
+      dataContainer.appendChild(card);
+    });
   }
 
-  // Event Listener for Date Change
-  document.getElementById("datePicker").addEventListener("change", function() {
-    loadDataForDate(this.value);
+  // --- Event listeners for date change and navigation
+  datePicker.addEventListener("change", () => loadData(datePicker.value));
+
+  document.getElementById("prevDate").addEventListener("click", () => {
+    const d = new Date(datePicker.value);
+    d.setDate(d.getDate() - 1);
+    datePicker.value = formatDateForInput(d);
+    loadData(datePicker.value);
   });
+
+  document.getElementById("nextDate").addEventListener("click", () => {
+    const d = new Date(datePicker.value);
+    d.setDate(d.getDate() + 1);
+    datePicker.value = formatDateForInput(d);
+    loadData(datePicker.value);
+  });
+
+  // --- Initial load
+  loadData(yesterday);
 </script>
 </body>
 </html>
