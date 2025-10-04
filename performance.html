@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Performance Dashboard - US CMS</title>
+<script src="papaparse.min.js"></script> <!-- Local PapaParse file -->
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #333;
+        min-height: 100vh;
+        padding: 30px;
+    }
+    .container {
+        max-width: 1300px;
+        margin: 0 auto;
+        background: #fff;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    }
+    h1 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 10px;
+    }
+    .subtitle {
+        text-align: center;
+        color: #666;
+        margin-bottom: 25px;
+    }
+    .date-nav {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+    .date-nav button {
+        background: #667eea;
+        color: white;
+        border: none;
+        padding: 8px 14px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: 0.3s;
+    }
+    .date-nav button:hover {
+        background: #5a6bd8;
+    }
+    input[type="date"] {
+        padding: 8px 14px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        font-size: 16px;
+    }
+    .table-wrapper {
+        overflow-x: auto;
+        border-radius: 10px;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 800px;
+    }
+    th {
+        background: #667eea;
+        color: white;
+        padding: 10px;
+        text-align: left;
+        position: sticky;
+        top: 0;
+    }
+    td {
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+    }
+    tr:hover { background: #f7f9ff; }
+    .no-data {
+        text-align: center;
+        padding: 40px;
+        font-size: 18px;
+        color: #666;
+    }
+    .summary {
+        display: flex;
+        justify-content: space-around;
+        margin: 25px 0;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+    .card {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        flex: 1 1 200px;
+        text-align: center;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .card h2 {
+        color: #667eea;
+        font-size: 28px;
+        margin-bottom: 5px;
+    }
+    .card p {
+        color: #555;
+        font-size: 14px;
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>📈 US CMS Performance Dashboard</h1>
+    <p class="subtitle">Daily performance summary by LOB</p>
+
+    <div class="date-nav">
+        <button id="prevDay">← Previous</button>
+        <input type="date" id="datePicker">
+        <button id="nextDay">Next →</button>
+    </div>
+
+    <div id="summary" class="summary"></div>
+
+    <div class="table-wrapper">
+        <table id="dataTable"></table>
+    </div>
+</div>
+
+<script>
+// ==============================
+// CONFIGURATION
+// ==============================
+const DATA_FILE_URL = "https://raw.githubusercontent.com/Faisaljeff/excel_file_viewer/main/performance_us_cms.csv";
+
+// ==============================
+// HELPER FUNCTIONS
+// ==============================
+function formatDate(date) {
+    return date.toISOString().split('T')[0];
+}
+
+function adjustDate(days) {
+    const picker = document.getElementById("datePicker");
+    const current = new Date(picker.value);
+    current.setDate(current.getDate() + days);
+    picker.value = formatDate(current);
+    filterData(current);
+}
+
+// ==============================
+// DATA LOADING
+// ==============================
+let allData = [];
+
+Papa.parse(DATA_FILE_URL, {
+    download: true,
+    header: true,
+    skipEmptyLines: true,
+    complete: function(results) {
+        allData = results.data;
+        console.log("CSV loaded:", allData.length, "rows");
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        document.getElementById("datePicker").value = formatDate(yesterday);
+        filterData(yesterday);
+    },
+    error: function(err) {
+        document.getElementById("dataTable").innerHTML = `<div class="no-data">Error loading data: ${err.message}</div>`;
+    }
+});
+
+// ==============================
+// FILTER & DISPLAY
+// ==============================
+function filterData(selectedDate) {
+    const formatted = selectedDate.toLocaleDateString("en-GB");
+    const filtered = allData.filter(row => row.Date === formatted);
+    renderTable(filtered);
+    renderSummary(filtered);
+}
+
+function renderTable(data) {
+    const table = document.getElementById("dataTable");
+    if (data.length === 0) {
+        table.innerHTML = `<tr><td colspan="10" class="no-data">No data available for this date</td></tr>`;
+        return;
+    }
+
+    let html = "<thead><tr>";
+    Object.keys(data[0]).forEach(key => { html += `<th>${key}</th>`; });
+    html += "</tr></thead><tbody>";
+
+    data.forEach(row => {
+        html += "<tr>";
+        Object.values(row).forEach(val => { html += `<td>${val}</td>`; });
+        html += "</tr>";
+    });
+    html += "</tbody>";
+    table.innerHTML = html;
+}
+
+function renderSummary(data) {
+    const summary = document.getElementById("summary");
+    if (data.length === 0) { summary.innerHTML = ""; return; }
+
+    // Example summary metrics
+    const totalRows = data.length;
+    const avgACR = (data.reduce((a,b)=>a+parseFloat(b.ACR||0),0)/totalRows).toFixed(2);
+    const avgDeficit = (data.reduce((a,b)=>a+parseFloat(b["Staffing Deficit"]||0),0)/totalRows).toFixed(1);
+
+    summary.innerHTML = `
+        <div class="card"><h2>${totalRows}</h2><p>LOB Entries</p></div>
+        <div class="card"><h2>${avgACR}</h2><p>Average ACR</p></div>
+        <div class="card"><h2>${avgDeficit}</h2><p>Avg Staffing Deficit</p></div>
+    `;
+}
+
+// ==============================
+// EVENT HANDLERS
+// ==============================
+document.getElementById("datePicker").addEventListener("change", (e) => {
+    filterData(new Date(e.target.value));
+});
+
+document.getElementById("prevDay").addEventListener("click", () => adjustDate(-1));
+document.getElementById("nextDay").addEventListener("click", () => adjustDate(1));
+</script>
+</body>
+</html>
