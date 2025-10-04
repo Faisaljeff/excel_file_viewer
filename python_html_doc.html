@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Pyodide + Matplotlib Demo</title>
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.28.3/full/pyodide.js"></script>
+</head>
+<body>
+  <h1>Pyodide + Matplotlib Chart Demo</h1>
+  <div id="plot-container"></div>
+
+  <script type="text/javascript">
+    async function main() {
+      const pyodide = await loadPyodide();
+      // Load matplotlib and numpy
+      await pyodide.loadPackage(["matplotlib", "numpy"]);
+      // Run a Python snippet that makes a plot and returns PNG as base64
+      const pngBase64 = pyodide.runPython(`
+import matplotlib
+# Use Agg backend (offscreen) so we can capture as image
+import matplotlib.pyplot as plt
+import numpy as np
+from io import BytesIO
+import base64
+
+# Example data
+x = np.linspace(0, 2 * np.pi, 200)
+y = np.sin(x) * np.cos(2 * x)
+
+plt.figure(figsize=(6,4))
+plt.plot(x, y, label='sin(x) * cos(2x)')
+plt.title("Demo Plot")
+plt.xlabel("x")
+plt.ylabel("y")
+plt.legend()
+plt.grid(True)
+
+buf = BytesIO()
+plt.savefig(buf, format="png")
+buf.seek(0)
+base64.b64encode(buf.read()).decode('utf-8')
+      `);
+
+      // Create an img element and insert
+      const img = document.createElement("img");
+      img.src = "data:image/png;base64," + pngBase64;
+      document.getElementById("plot-container").appendChild(img);
+    }
+
+    main().catch(err => {
+      console.error("Error in Pyodide script:", err);
+      const e = document.createElement("pre");
+      e.textContent = err;
+      document.body.appendChild(e);
+    });
+  </script>
+</body>
+</html>
